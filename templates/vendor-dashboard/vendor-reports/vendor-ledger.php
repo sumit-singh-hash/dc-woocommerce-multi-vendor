@@ -11,6 +11,7 @@
 if (!defined('ABSPATH'))
     exit; // Exit if accessed directly
 global $WCMp;
+$date_format = get_option( 'date_format' );
 ?>
 <div class="col-md-12 wcmp-vendor-ledger-wrapper">
 
@@ -58,6 +59,7 @@ global $WCMp;
                     </div>
                 </div>
             </div>
+            <input type="hidden" id="date_format" value="<?php echo $date_format; ?>" />
             <div id="vendor_ledger_date_filter" class="form-inline datatable-date-filder">
                 <div class="form-group">
                     <span class="date-inp-wrap">
@@ -90,14 +92,15 @@ global $WCMp;
 </div>
 <script>
 jQuery(document).ready(function($) {
+    var format = $('#date_format').val();
     $( "#wcmp_from_date" ).datepicker({ 
-        dateFormat: 'yy-mm-dd',
+        dateFormat: format.toLowerCase(),
         onClose: function (selectedDate) {
             $("#wcmp_to_date").datepicker("option", "minDate", selectedDate);
         }
     });
     $( "#wcmp_to_date" ).datepicker({ 
-        dateFormat: 'yy-mm-dd',
+        dateFormat: format.toLowerCase(),
         onClose: function (selectedDate) {
             $("#wcmp_from_date").datepicker("option", "maxDate", selectedDate);
         }

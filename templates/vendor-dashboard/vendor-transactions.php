@@ -20,6 +20,7 @@ $transactions_list_table_headers = apply_filters('wcmp_datatable_vendor_transact
     'fees'  => array('label' => __( 'Fee', 'dc-woocommerce-multi-vendor' )),
     'net_earning'        => array('label' => __( 'Net Earnings', 'dc-woocommerce-multi-vendor' )),
 ), get_current_user_id());
+$date_format = get_option( 'date_format' );
 ?>
 <div class="col-md-12">
     
@@ -27,6 +28,7 @@ $transactions_list_table_headers = apply_filters('wcmp_datatable_vendor_transact
         <div class="panel-body">
             <div id="vendor_transactions_date_filter" class="form-inline datatable-date-filder">
                 <div class="form-group">
+                    <input type="hidden" id="date_format" value="<?php echo $date_format; ?>" />
                     <span class="date-inp-wrap">
                         <input id="wcmp_from_date" class="form-control" name="from_date" class="pickdate gap1" placeholder="From" value ="<?php echo date('Y-m-01'); ?>"/>
                     </span>
@@ -73,14 +75,15 @@ $transactions_list_table_headers = apply_filters('wcmp_datatable_vendor_transact
 </div>
 <script>
 jQuery(document).ready(function($) {
+    var format = $('#date_format').val();
     $( "#wcmp_from_date" ).datepicker({ 
-        dateFormat: 'yy-mm-dd',
+        dateFormat: format.toLowerCase(),
         onClose: function (selectedDate) {
             $("#wcmp_to_date").datepicker("option", "minDate", selectedDate);
         }
     });
     $( "#wcmp_to_date" ).datepicker({ 
-        dateFormat: 'yy-mm-dd',
+        dateFormat: format.toLowerCase(),
         onClose: function (selectedDate) {
             $("#wcmp_from_date").datepicker("option", "maxDate", selectedDate);
         }
