@@ -2310,6 +2310,8 @@ class WCMp_Ajax {
                     do_action('wcmp_product_qna_after_question_submitted', $product_id, $cust_id, $cust_question);
                 }
             }
+            $email_vendor = WC()->mailer()->emails['WC_Email_Vendor_New_Question'];
+            $email_vendor->trigger( $vendor, $cust_question );
         } elseif ($handler == 'search') {
             $keyword = isset($_POST['keyword']) ? $_POST['keyword'] : '';
             $product_id = isset($_POST['product_ID']) ? $_POST['product_ID'] : 0;
@@ -2393,6 +2395,9 @@ class WCMp_Ajax {
             $ques_ID = isset($_POST['key']) ? $_POST['key'] : '';
             $reply = isset($_POST['reply']) ? sanitize_textarea_field($_POST['reply']) : '';
             $vendor = get_wcmp_vendor(get_current_user_id());
+            $question_info = $WCMp->product_qna->get_Question($ques_ID);
+            $product_id = $question_info->product_ID;
+            $customer = get_userdata($question_info->ques_by);
             if ($vendor && $reply && $ques_ID) {
                 $_is_answer_given = $WCMp->product_qna->get_Answers($ques_ID);
                 if (isset($_is_answer_given[0]) && count($_is_answer_given[0]) > 0) {
@@ -2424,6 +2429,8 @@ class WCMp_Ajax {
                     $no_data = 1;
                 }
             }
+            $email_customer = WC()->mailer()->emails['WC_Email_Customer_Answer'];
+            $email_customer->trigger( $customer, $reply, $product_id );
         } elseif ($handler == 'vote_answer') {
             $ans_ID = isset($_POST['ans_ID']) ? (int) $_POST['ans_ID'] : '';
             $vote_type = isset($_POST['vote']) ? $_POST['vote'] : '';

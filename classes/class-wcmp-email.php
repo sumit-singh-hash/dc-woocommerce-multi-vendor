@@ -32,6 +32,8 @@ class WCMp_Email {
         include( 'emails/class-wcmp-email-approved-vendor-new-account.php' );
         include( 'emails/class-wcmp-email-rejected-vendor-new-account.php' );
         include( 'emails/class-wcmp-email-vendor-new-order.php' );
+        include( 'emails/class-wcmp-email-vendor-new-question.php' );
+        include( 'emails/class-wcmp-email-customer-answer.php' );
         include( 'emails/class-wcmp-email-vendor-notify-shipped.php' );
         include( 'emails/class-wcmp-email-vendor-new-product-added.php' );
         include( 'emails/class-wcmp-email-admin-added-new-product-to-vendor.php' );
@@ -48,6 +50,8 @@ class WCMp_Email {
         $wcmp_email['WC_Email_Approved_New_Vendor_Account'] = new WC_Email_Approved_New_Vendor_Account();
         $wcmp_email['WC_Email_Rejected_New_Vendor_Account'] = new WC_Email_Rejected_New_Vendor_Account();
         $wcmp_email['WC_Email_Vendor_New_Order'] = new WC_Email_Vendor_New_Order();
+        $wcmp_email['WC_Email_Vendor_New_Question'] = new WC_Email_Vendor_New_Question();
+        $wcmp_email['WC_Email_Customer_Answer'] = new WC_Email_Customer_Answer();
         $wcmp_email['WC_Email_Notify_Shipped'] = new WC_Email_Notify_Shipped();
         $wcmp_email['WC_Email_Vendor_New_Product_Added'] = new WC_Email_Vendor_New_Product_Added();
         $wcmp_email['WC_Email_Admin_Added_New_Product_to_Vendor'] = new WC_Email_Admin_Added_New_Product_to_Vendor();
