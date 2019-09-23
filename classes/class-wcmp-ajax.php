@@ -223,12 +223,20 @@ class WCMp_Ajax {
                 ),
             )
         );
+        $filterActionData = array();
+        parse_str($requestData['order_filter_action'], $filterActionData);
+        do_action('before_wcmp_orders_list_query_bind', $filterActionData, $requestData);
         $vendor_all_orders = apply_filters('wcmp_datatable_get_vendor_all_orders', wcmp_get_orders($args), $requestData, $_POST);
 
         
 //        $vendor_all_orders = $wpdb->get_results("SELECT DISTINCT order_id from `{$wpdb->prefix}wcmp_vendor_orders` where commission_id > 0 AND vendor_id = '" . $vendor->id . "' AND (`created` >= '" . $start_date . "' AND `created` <= '" . $end_date . "') and `is_trashed` != 1 ORDER BY `created` DESC", ARRAY_A);
 //        $vendor_all_orders = apply_filters('wcmp_datatable_get_vendor_all_orders', $vendor_all_orders, $requestData, $_POST);
 //        $vendor_all_orders = apply_filters('wcmp_datatable_get_vendor_all_orders_id', wp_list_pluck($vendor_all_orders, 'order_id'));
+        if (isset($requestData['bulk_action']) && $requestData['bulk_action'] != '' && isset($filterActionData['selected_orders']) && is_array($filterActionData['selected_orders'])) {
+            foreach ($filterActionData['selected_orders'] as $order_id) {
+                wp_update_post(array('ID' => $order_id, 'post_status' => $requestData['bulk_action'] ));
+            }
+        }
         if (isset($requestData['order_status']) && $requestData['order_status'] != 'all' && $requestData['order_status'] != '') {
             foreach ($vendor_all_orders as $key => $value) {
                 if (wc_get_order($value)->get_status() != $requestData['order_status']) {

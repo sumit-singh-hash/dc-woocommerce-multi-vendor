@@ -22,6 +22,7 @@ $orders_list_table_headers = apply_filters('wcmp_datatable_order_list_table_head
     'order_status'  => array('label' => __( 'Status', 'dc-woocommerce-multi-vendor' )),
     'action'        => array('label' => __( 'Action', 'dc-woocommerce-multi-vendor' )),
 ), get_current_user_id());
+$bulk_statuses = wc_get_order_statuses();
 ?>
 <div class="col-md-12">
     <div class="panel panel-default">
@@ -40,7 +41,20 @@ $orders_list_table_headers = apply_filters('wcmp_datatable_order_list_table_head
                 </div>
                 <button class="wcmp_black_btn btn btn-default" type="submit" name="wcmp_order_submit"><?php _e('Show', 'dc-woocommerce-multi-vendor'); ?></button>
             </form>
-            <form method="post" name="wcmp_vendor_dashboard_completed_stat_export">
+            <form method="post" name="wcmp_vendor_dashboard_completed_stat_export" id="wcmp_vendor_dashboard_completed_stat_export">
+                <div class="form-group">
+                    <select id="order_bulk_actions" name="bulk_action" class="wcmp-filter-dtdd wcmp_product_bulk_actions form-control inline-input">
+                        <option value=""><?php _e('Bulk Actions', 'dc-woocommerce-multi-vendor'); ?></option>
+                        <?php 
+                        if($bulk_statuses) :
+                            foreach ($bulk_statuses as $key => $status) {
+                                echo '<option value="'.$key.'">'.$status.'</option>';
+                            }
+                        endif;
+                        ?>
+                    </select>
+                    <button class="wcmp_black_btn btn btn-default" type="button" id="order_list_do_bulk_action"><?php _e('Apply', 'dc-woocommerce-multi-vendor'); ?></button>
+                </div>
                 <table class="table table-striped table-bordered" id="wcmp-vendor-orders" style="width:100%;">
                     <thead>
                         <tr>
@@ -168,9 +182,11 @@ $orders_list_table_headers = apply_filters('wcmp_datatable_order_list_table_head
                 url: '<?php echo add_query_arg( 'action', 'wcmp_datatable_get_vendor_orders', $WCMp->ajax_url() ); ?>',
                 type: "post",
                 data: function (data) {
+                    data.order_filter_action = $('form#wcmp_vendor_dashboard_completed_stat_export').serialize();
                     data.start_date = '<?php echo $start_date; ?>';
                     data.end_date = '<?php echo $end_date; ?>';
                     data.order_status = $('#filter_by_order_status').val();
+                    data.bulk_action = $('#order_bulk_actions').val();
                 },
                 error: function(xhr, status, error) {
                     $("#wcmp-vendor-orders tbody").append('<tr class="odd"><td valign="top" colspan="6" class="dataTables_empty" style="text-align:center;">'+error+' - <a href="javascript:window.location.reload();"><?php _e('Reload', 'dc-woocommerce-multi-vendor'); ?></a></td></tr>');
@@ -181,6 +197,9 @@ $orders_list_table_headers = apply_filters('wcmp_datatable_order_list_table_head
         });
         new $.fn.dataTable.FixedHeader( orders_table );
         $(document).on('change', '#filter_by_order_status', function () {
+            orders_table.ajax.reload();
+        });
+        $(document).on('click', '#order_list_do_bulk_action', function (e) {
             orders_table.ajax.reload();
         });
     });
