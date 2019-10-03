@@ -72,6 +72,8 @@ if (!class_exists('WC_Email_Vendor_New_Order')) :
                     $this->object = $this->order = wc_get_order($order_id);
                     $vendor_email = $vendor->user_data->user_email;
 
+                    $this->find = [];
+                    $this->replace = [];
                     $this->find[] = '{order_date}';
                     $this->replace[] = date_i18n(wc_date_format(), strtotime($this->order->get_date_created()));
 
