@@ -41,6 +41,7 @@ if(isset($more_product_array) && is_array($more_product_array) && count($more_pr
 	}
 	foreach ($more_product_array as $more_product ) {	
             $_product = wc_get_product($more_product['product_id']);
+            if($_product->get_status()== 'publish') {
 		?>
 		<div class="row rowbody">						
 			<div class="rowsub ">
@@ -70,6 +71,7 @@ if(isset($more_product_array) && is_array($more_product_array) && count($more_pr
 		
 		
 	<?php
+	}
 	}
 }
 ?>

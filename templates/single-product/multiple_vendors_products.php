@@ -19,7 +19,15 @@ if (!defined('ABSPATH')) {
 }
 global $WCMp, $post, $wpdb;
 if (count($more_product_array) > 0) {
+    $product_publish = false;
+    foreach ($more_product_array as $more_product ) {   
+        $_product = wc_get_product($more_product['product_id']);
+        if($_product->get_status()== 'publish') {
+            $product_publish = true;
+        }
+    }
     $i = 0;
+    if($product_publish) {
     ?>
     <div class="ajax_loader_class_msg"><img src="<?php echo $WCMp->plugin_url ?>assets/images/ajax-loader.gif" alt="ajax-loader" /></div>
     <div class="container">		
@@ -41,6 +49,7 @@ if (count($more_product_array) > 0) {
         ?>		
     </div>		
     <?php
+    }
 } else {
     ?>
     <div class="container">
