@@ -896,6 +896,7 @@ class WCMp_Vendor_Hooks {
     	global $WCMp, $wp;
     	
     	if(isset($wp->query_vars['rejected-vendor-reapply'])) {
+            do_action( 'wcmp_after_resubmit_application_submitted' );
     		$WCMp->template->get_template('non-vendor/rejected-vendor-reapply.php');
     	} else {
     		$WCMp->template->get_template('non-vendor/rejected-vendor-dashboard.php');

@@ -24,7 +24,7 @@ if(is_array($wcmp_vendor_rejection_notes) && count($wcmp_vendor_rejection_notes)
 	echo '</div></div></div></div>';
 }
 
-echo '<div class="wcmp-action-container"><a class="btn btn-default" href="' . apply_filters( 'wcmp_resubmit_application_redirect', esc_url(wcmp_get_vendor_dashboard_endpoint_url('rejected-vendor-reapply')) ) . '">' . __('Resubmit Application', 'dc-woocommerce-multi-vendor') . '</a></div>';
+echo '<div class="wcmp-action-container"><a class="btn btn-default" href="' . esc_url(wcmp_get_vendor_dashboard_endpoint_url('rejected-vendor-reapply')) . '">' . __('Resubmit Application', 'dc-woocommerce-multi-vendor') . '</a></div>';
 
 
 
