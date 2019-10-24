@@ -166,7 +166,7 @@ class WCMp_User {
                                 }
                             }
                             foreach ($attacment_files['type'][$key] as $file_key => $file_value) {
-                                if (!in_array($file_value, $file_type)) {
+                                if (!in_array($file_value, $file_type) && !empty($file_value)) {
                                     $validation_errors->add('file type error', __('Please Upload valid file', 'dc-woocommerce-multi-vendor'));
                                 }
                             }
