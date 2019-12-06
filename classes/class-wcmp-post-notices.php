@@ -15,6 +15,7 @@ class WCMp_Notices {
   public function __construct() {
     $this->post_type = 'wcmp_vendor_notice';
     $this->register_post_type();
+    	add_action('transition_post_status', array( $this, 'vendor_notices_send_email' ), 10, 3 );
 		add_action( 'add_meta_boxes', array($this,'vendor_notices_add_meta_box_addtional_field') );
 		add_action( 'save_post', array( $this, 'vendor_notices_save_addtional_field' ), 10, 3 );		
   }
@@ -44,6 +45,16 @@ class WCMp_Notices {
   		<input type="text" name="_wcmp_vendor_notices_url" value="<?php echo $url; ?>" class="widefat" style="margin:10px; border:1px solid #888; width:90%;" >			
 		</div>			
 		<?php
+  }
+
+  public function vendor_notices_send_email( $new_status, $old_status, $post ) { 
+  	if ( $new_status == 'publish' && $old_status != 'publish' ) {
+		$email_vendor = WC()->mailer()->emails['WC_Email_Vendor_New_Announcement'];
+		$vendors = get_wcmp_vendors();
+		foreach ($vendors as $vendor) {
+			$email_vendor->trigger( $post, $vendor );
+    	}
+  	}
   }
   
   public function vendor_notices_save_addtional_field($post_id, $post, $update) {
