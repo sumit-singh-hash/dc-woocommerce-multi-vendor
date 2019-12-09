@@ -50,6 +50,8 @@ Class WCMp_Admin_Dashboard {
         $this->vendor_withdrawl();
 
         $this->export_vendor_orders_csv();
+
+        $this->order_status_by_bulk_action();
         // vendor tools handler
         $this->vendor_tools_handler();
         // vendor updater handler
@@ -1014,6 +1016,21 @@ Class WCMp_Admin_Dashboard {
                     }
                 } else {
                     wc_add_notice(__('Please select atleast one and more order.', 'dc-woocommerce-multi-vendor'), 'error');
+                }
+            }
+        }
+    }
+
+    public function order_status_by_bulk_action() {
+        global $wpdb;
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (isset($_POST['wcmp_order_change_bulk_action'])) {
+                $order_status = $_POST['bulk_action'];
+                $order_ids = isset($_POST['selected_orders']) ? $_POST['selected_orders'] : array();
+                if ($order_ids && count($order_ids) > 0) {
+                    foreach ($order_ids as $order_id) {
+                        wp_update_post(array('ID' => $order_id, 'post_status' => $order_status ));
+                    }
                 }
             }
         }

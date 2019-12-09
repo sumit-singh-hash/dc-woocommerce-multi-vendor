@@ -22,6 +22,7 @@ $orders_list_table_headers = apply_filters('wcmp_datatable_order_list_table_head
     'order_status'  => array('label' => __( 'Status', 'dc-woocommerce-multi-vendor' )),
     'action'        => array('label' => __( 'Action', 'dc-woocommerce-multi-vendor' )),
 ), get_current_user_id());
+$bulk_statuses = wc_get_order_statuses();
 ?>
 <div class="col-md-12">
     <div class="panel panel-default">
@@ -41,6 +42,19 @@ $orders_list_table_headers = apply_filters('wcmp_datatable_order_list_table_head
                 <button class="wcmp_black_btn btn btn-default" type="submit" name="wcmp_order_submit"><?php _e('Show', 'dc-woocommerce-multi-vendor'); ?></button>
             </form>
             <form method="post" name="wcmp_vendor_dashboard_completed_stat_export">
+                <div class="form-group">
+                    <select id="order_bulk_actions" name="bulk_action" class="wcmp-filter-dtdd wcmp_product_bulk_actions form-control inline-input">
+                        <option value=""><?php _e('Bulk Actions', 'dc-woocommerce-multi-vendor'); ?></option>
+                        <?php 
+                        if($bulk_statuses) :
+                            foreach ($bulk_statuses as $key => $status) {
+                                echo '<option value="'.$key.'">'.$status.'</option>';
+                            }
+                        endif;
+                        ?>
+                    </select>
+                    <input class="btn btn-default" type="submit" name="wcmp_order_change_bulk_action" value="<?php _e('Apply', 'dc-woocommerce-multi-vendor') ?>" />
+                </div>
                 <table class="table table-striped table-bordered" id="wcmp-vendor-orders" style="width:100%;">
                     <thead>
                         <tr>
