@@ -80,6 +80,7 @@ if (!class_exists('WC_Email_Vendor_New_Order')) :
                     $this->vendor_email = $vendor_email;
                     $this->vendor_id = $vendor_id;
                     $this->recipient = $vendor_email;
+                    $this->additional_content = $this->object->customer_message;
                 }
 
                 if (!$this->is_enabled() || !$this->get_recipient()) {
@@ -101,6 +102,7 @@ if (!class_exists('WC_Email_Vendor_New_Order')) :
                 'email_heading' => $this->get_heading(),
                 'vendor_id' => $this->vendor_id,
                 'order' => $this->order,
+                'additional_content' => $this->additional_content,
                 'blogname' => $this->get_blogname(),
                 'sent_to_admin' => false,
                 'plain_text' => false,
@@ -119,11 +121,22 @@ if (!class_exists('WC_Email_Vendor_New_Order')) :
                 'email_heading' => $this->get_heading(),
                 'vendor_id' => $this->vendor_id,
                 'order' => $this->order,
+                'additional_content' => $this->additional_content,
                 'blogname' => $this->get_blogname(),
                 'sent_to_admin' => false,
                 'plain_text' => true,
                 'email'         => $this,
                     ), 'dc-product-vendor/', $this->template_base);
+        }
+
+        /**
+         * Default content to show below main email content.
+         *
+         * @access public
+         * @return string
+         */
+        function get_default_additional_content() {
+            return __( 'Congratulations on the sale.', 'dc-woocommerce-multi-vendor' );
         }
 
         /**
@@ -154,6 +167,14 @@ if (!class_exists('WC_Email_Vendor_New_Order')) :
                     'description' => sprintf(__('This controls the main heading contained within the email notification. Leave it blank to use the default heading: <code>%s</code>.', 'dc-woocommerce-multi-vendor'), $this->get_default_heading()),
                     'placeholder' => '',
                     'default' => ''
+                ),
+                'additional_content' => array(
+                    'title'       => __( 'Additional content', 'dc-woocommerce-multi-vendor' ),
+                    'type'        => 'textarea',
+                    'description' => __( 'Text to appear below the main email content.', 'dc-woocommerce-multi-vendor' ) . ' ' . $placeholder_text,
+                    'css'         => 'width:400px; height: 75px;',
+                    'placeholder' => __( 'N/A', 'woocommerce' ),
+                    'default'     => $this->get_default_additional_content(),
                 ),
                 'email_type' => array(
                     'title' => __('Email Type', 'dc-woocommerce-multi-vendor'),
