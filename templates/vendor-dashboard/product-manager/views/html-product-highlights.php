@@ -55,13 +55,7 @@ global $WCMp;
                     $flag = 0;
                     foreach ( $get_different_terms_hierarchy as $term_id ) {
                         if( $flag >= 1 ) continue;
-                        $term_id = ($default_cat_hierarchy) ? $default_cat_hierarchy : $term_id;\
-                        echo '<input type="hidden" name="_default_cat_hierarchy_term_id" id="_default_cat_hierarchy_term_id_' . esc_attr( $default_cat_hierarchy ) . '" value="' . esc_attr( $default_cat_hierarchy ) . '" data-label="' . esc_attr( $default_cat_hierarchy ) . '" />';
-                        $hierarchy = get_ancestors($term_id, $term_tax );
-                        $hierarchy[] = $default_cat_hierarchy;
-                        foreach ( $hierarchy as $term_id ) {
-                            echo '<input type="hidden" name="tax_input[' . $term_tax . '][]" value="' . $term_id . '" />';
-                        }
+                        $term_id = ($default_cat_hierarchy) ? $default_cat_hierarchy : $term_id;
                         wcmp_generate_term_breadcrumb_html( array(
                         'term_id' => $term_id, 
                         'taxonomy' => $term_tax,
@@ -109,12 +103,12 @@ global $WCMp;
                         </div>
                     </div>
                     <?php }
-                }
-                // save terms for post save handler 
-                if( $terms ){
-                    foreach ( $terms as $term_id ) {
-                        echo '<input type="hidden" name="tax_input[' . $term_tax . '][]" value="' . $term_id . '" />';
-                    }
+                        //save terms for post save handler 
+                       if( $terms ){
+                           foreach ( $terms as $term_id ) {
+                               echo '<input type="hidden" name="tax_input[' . $term_tax . '][]" value="' . $term_id . '" />';
+                           }
+                       }
                 }
             }
         ?>
