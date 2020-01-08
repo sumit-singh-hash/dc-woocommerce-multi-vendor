@@ -642,7 +642,7 @@ class WCMp_Commission {
         }
    
         $commissions = new WP_Query( $args );
-        if( $commissions->get_posts() ) :
+        if( apply_filters('wcmp_commissions_by_order_status', $commissions->get_posts()) ) :
             $commission_amount = $shipping_amount = $tax_amount = $total = 0;
             foreach ( $commissions->get_posts() as $commission_id ) {
                 $commission_amount += self::commission_amount_totals( $commission_id, 'edit' );
