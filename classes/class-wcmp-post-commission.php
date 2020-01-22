@@ -645,7 +645,7 @@ class WCMp_Commission {
         if( $commissions->get_posts() ) :
             $commission_amount = $shipping_amount = $tax_amount = $total = 0;
             $commission_posts = apply_filters( 'wcmp_before_get_commissions_total_data_commission_posts', $commissions->get_posts(), $vendor_id, $args );
-            foreach ( $commissions->get_posts() as $commission_id ) {
+            foreach ( $commission_posts as $commission_id ) {
                 $commission_amount += self::commission_amount_totals( $commission_id, 'edit' );
                 $shipping_amount += self::commission_shipping_totals( $commission_id, 'edit' );
                 $tax_amount += self::commission_tax_totals( $commission_id, 'edit' );
