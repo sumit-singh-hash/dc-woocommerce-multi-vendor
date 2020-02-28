@@ -519,10 +519,10 @@ class WCMp_Order {
         if(!$migration){
         
             foreach ($packages as $package_key => $package) {
-                if ($package_key == $vendor_id && isset($chosen_shipping_methods[$package_key], $package['rates'][$chosen_shipping_methods[$package_key]])) {
+                if ($package['vendor_id'] == $vendor_id && isset($chosen_shipping_methods[$package_key], $package['rates'][$chosen_shipping_methods[$package_key]])) {
                     $shipping_rate = $package['rates'][$chosen_shipping_methods[$package_key]];
                     $item = new WC_Order_Item_Shipping();
-                    $item->legacy_package_key = $package_key; // @deprecated For legacy actions.
+                    $item->legacy_package_key = $package['vendor_id']; // @deprecated For legacy actions.
                     $item->set_props(
                             array(
                                 'method_title' => $shipping_rate->label,
@@ -539,7 +539,7 @@ class WCMp_Order {
                         $item->add_meta_data($key, $value, true);
                     }
 
-                    $item->add_meta_data('vendor_id', $package_key, true);
+                    $item->add_meta_data('vendor_id', $package['vendor_id'], true);
                     $package_qty = array_sum(wp_list_pluck($package['contents'], 'quantity'));
                     $item->add_meta_data('package_qty', $package_qty, true);
                     // add parent item_id in meta
@@ -551,7 +551,7 @@ class WCMp_Order {
                      *
                      * @since 3.4.0
                      */
-                    do_action('wcmp_vendor_create_order_shipping_item', $item, $package_key, $package, $order);
+                    do_action('wcmp_vendor_create_order_shipping_item', $item, $package['vendor_id'], $package, $order);
 
                     // Add item to order and save.
                     $order->add_item($item);
