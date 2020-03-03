@@ -3017,7 +3017,9 @@ class WCMp_Ajax {
                         'value'   => 0,
 			'compare' => '!=',
                     )
-                )
+                ),
+                'post_status' => apply_filters( 'wcmp_dashboard_widget_exclude_order_statuses', array( 'wc-processing','wc-completed' ) )
+
             );
             $vendor_orders = wcmp_get_orders( $query, 'object' );
             

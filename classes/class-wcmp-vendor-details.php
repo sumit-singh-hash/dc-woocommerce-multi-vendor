@@ -924,7 +924,9 @@ class WCMp_Vendor {
                             'before'    => $args['end_date'],
                             'inclusive' => true,
                         ),
-                    )
+                    ),
+                    'post_status' => apply_filters( 'wcmp_dashboard_widget_exclude_order_statuses', array( 'wc-processing','wc-completed' ) )
+
                 );
                 $vendor_orders = wcmp_get_orders( $query, 'object' );
 
@@ -989,7 +991,9 @@ class WCMp_Vendor {
                             'key'       => 'wcmp_vendor_order_shipped',
                             'compare'   => 'NOT EXISTS',
                         )
-                    )
+                    ),
+                    'post_status' => apply_filters( 'wcmp_dashboard_widget_exclude_order_statuses', array( 'wc-processing','wc-completed' ) )
+
                 );
                 $vendor_orders = wcmp_get_orders( $query, 'object' );
 
