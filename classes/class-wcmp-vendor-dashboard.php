@@ -1999,7 +1999,8 @@ Class WCMp_Admin_Dashboard {
                 wp_redirect( apply_filters( 'wcmp_vendor_save_product_redirect_url', wcmp_get_vendor_dashboard_endpoint_url( get_wcmp_vendor_settings( 'wcmp_edit_product_endpoint', 'vendor', 'general', 'edit-product' ), $post_id ) ) );
                 exit;
             } else {
-                wc_add_notice( $post_id->get_error_message(), 'error' );
+                $error = sprintf( __( '%s', 'dc-woocommerce-multi-vendor' ), $post_id->get_error_message() );
+                wc_add_notice( $error, 'error' );
             }
         }
     }
