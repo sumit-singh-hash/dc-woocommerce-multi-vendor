@@ -3,11 +3,11 @@ if (!defined('ABSPATH'))
     exit;
 
 /**
- * @class 		WCMp Vendor Class
+ * @class       WCMp Vendor Class
  *
- * @version		2.2.0
- * @package		WCMp
- * @author 		WC Marketplace
+ * @version     2.2.0
+ * @package     WCMp
+ * @author      WC Marketplace
  */
 class WCMp_Vendor {
 
@@ -359,10 +359,10 @@ class WCMp_Vendor {
     public function get_products_ids( $clauses = array() ) {
         global $wpdb;
         $default_clauses = array(
-            'fields'    => 'wp_posts.ID',
-            'where'     => "AND wp_posts.post_status = 'publish' ",
-            'groupby'   => 'wp_posts.ID',
-            'orderby'   => 'wp_posts.post_date DESC',
+            'fields'    => $wpdb->prefix.'posts.ID',
+            'where'     => "AND ".$wpdb->prefix."posts.post_status = 'publish' ",
+            'groupby'   => $wpdb->prefix.'posts.ID',
+            'orderby'   => $wpdb->prefix.'posts.post_date DESC',
             'limits'    => ''
         );
         $clauses = apply_filters( 'wcmp_get_products_ids_clauses_request', wp_parse_args( $clauses, $default_clauses ) );
@@ -374,14 +374,14 @@ class WCMp_Vendor {
         $sql = "SELECT
                 $fields
             FROM
-                wp_posts
-            LEFT JOIN wp_term_relationships ON(
-                    wp_posts.ID = wp_term_relationships.object_id
+                {$wpdb->prefix}posts
+            LEFT JOIN {$wpdb->prefix}term_relationships ON(
+                    {$wpdb->prefix}posts.ID = {$wpdb->prefix}term_relationships.object_id
                 )
             WHERE
                 1 = 1 AND(
-                    wp_term_relationships.term_taxonomy_id IN( $this->term_id )
-                ) AND wp_posts.post_author IN( $this->id ) AND wp_posts.post_type = 'product' $where
+                    {$wpdb->prefix}term_relationships.term_taxonomy_id IN( $this->term_id )
+                ) AND {$wpdb->prefix}posts.post_author IN( $this->id ) AND {$wpdb->prefix}posts.post_type = 'product' $where
             GROUP BY
                 $groupby
             ORDER BY
@@ -526,35 +526,49 @@ class WCMp_Vendor {
      * @param product id , vendor term id 
      * @return array with order id
      */
-    public function get_vendor_orders_by_product($vendor_term_id, $product_id) {
+    public function get_vendor_orders_by_product($vendor_id, $product_id) {
         $order_dtl = array();
-        if ($product_id && $vendor_term_id) {
-            $commissions = false;
-            $args = array(
-                'post_type' => 'dc_commission',
-                'post_status' => array('publish', 'private'),
-                'posts_per_page' => -1,
-                'order' => 'asc',
-                'meta_query' => array(
-                    array(
-                        'key' => '_commission_vendor',
-                        'value' => absint($vendor_term_id),
-                        'compare' => '='
-                    ),
-                    array(
-                        'key' => '_commission_product',
-                        'value' => absint($product_id),
-                        'compare' => 'LIKE'
-                    ),
-                ),
-            );
-            $commissions = get_posts($args);
-            if (!empty($commissions)) {
-                foreach ($commissions as $commission) {
-                    $order_dtl[] = get_post_meta($commission->ID, '_commission_order_id', true);
+        $orders = wcmp_get_orders(array('author' => $vendor_id));
+        if(!empty($orders)) {
+            foreach($orders as $order_id) {
+                $order = wc_get_order( $order_id );
+                $items = $order->get_items();
+                foreach( $items as $item ) {
+                    $item_id = $item->get_variation_id() ? $item->get_variation_id() : $item->get_product_id();
+                    if( $product_id == $item_id ) {
+                        array_push($order_dtl,$order_id);
+                        //continue;
+                    }
                 }
             }
         }
+        // if ($product_id && $vendor_term_id) {
+        //     $commissions = false;
+        //     $args = array(
+        //         'post_type' => 'dc_commission',
+        //         'post_status' => array('publish', 'private'),
+        //         'posts_per_page' => -1,
+        //         'order' => 'asc',
+        //         'meta_query' => array(
+        //             array(
+        //                 'key' => '_commission_vendor',
+        //                 'value' => absint($vendor_term_id),
+        //                 'compare' => '='
+        //             ),
+        //             array(
+        //                 'key' => '_commission_product',
+        //                 'value' => absint($product_id),
+        //                 'compare' => 'LIKE'
+        //             ),
+        //         ),
+        //     );
+        //     $commissions = get_posts($args);
+        //     if (!empty($commissions)) {
+        //         foreach ($commissions as $commission) {
+        //             $order_dtl[] = get_post_meta($commission->ID, '_commission_order_id', true);
+        //         }
+        //     }
+        // }
         return $order_dtl;
     }
 
@@ -621,7 +635,7 @@ class WCMp_Vendor {
                     wc_display_item_meta($item);
                     ?>
                 </td>
-                <td scope="col" style="text-align:left; border: 1px solid #eee;">	
+                <td scope="col" style="text-align:left; border: 1px solid #eee;">   
                     <?php
                     echo $item->get_quantity();
                     ?>

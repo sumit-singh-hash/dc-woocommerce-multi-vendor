@@ -3,7 +3,7 @@
 /**
  *  WCMPp Vendor Admin Dashboard - Vendor WP-Admin Dashboard Pages
  * 
- * @version	2.2.0
+ * @version 2.2.0
  * @package WCMp
  * @author  WC Marketplace
  */
@@ -444,7 +444,7 @@ Class WCMp_Admin_Dashboard {
                 $order = wc_get_order($_POST['order_id']);
                 $comment = esc_textarea($_POST['comment_text']);
                 $note_type = isset($_POST['note_type']) ? $_POST['note_type'] : '';
-		$is_customer_note = ( 'customer' === $note_type ) ? 1 : 0;
+        $is_customer_note = ( 'customer' === $note_type ) ? 1 : 0;
                 $comment_id = $order->add_order_note($comment, $is_customer_note, true);
                 if( $is_customer_note ){
                     $email_note = WC()->mailer()->emails['WC_Email_Customer_Note'];
@@ -1572,13 +1572,13 @@ Class WCMp_Admin_Dashboard {
         }
 
         public function wcmp_vendor_product_stats($args = array()) {
-            global $WCMp;
+            global $WCMp,$wpdb;
             $publish_products_count = $pending_products_count = $draft_products_count = $trashed_products_count = 0;
             $vendor = get_wcmp_vendor(get_current_user_id());
             $args = array('post_status' => array('publish', 'pending', 'draft', 'trash'));
             $product_stats = array();
             if($vendor) :
-                $where = "AND (wp_posts.post_status = 'publish' OR wp_posts.post_status = 'draft' OR wp_posts.post_status = 'pending' OR wp_posts.post_status = 'trash')";
+                $where = "AND ({$wpdb->prefix}posts.post_status = 'publish' OR {$wpdb->prefix}posts.post_status = 'draft' OR {$wpdb->prefix}posts.post_status = 'pending' OR {$wpdb->prefix}posts.post_status = 'trash')";
                 $products = $vendor->get_products_ids( array( 'where' => $where ) );
                 $product_stats['total_products'] = count($products);
                 foreach ( $products as $product) {
