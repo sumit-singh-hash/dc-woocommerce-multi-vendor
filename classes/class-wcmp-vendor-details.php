@@ -526,9 +526,10 @@ class WCMp_Vendor {
      * @param product id , vendor id 
      * @return array with order id
      */
-    public function get_vendor_orders_by_product($vendor_id, $product_id) {
+    public function get_vendor_orders_by_product($vendor_term_id, $product_id) {
         $order_dtl = array();
-        $args = apply_filters('wcmp_orders_by_product_args', array('author' => $vendor_id, 'post_status' => array('wc-processing', 'wc-completed')));
+        $vendor = get_wcmp_vendor_by_term($vendor_term_id);
+        $args = apply_filters('wcmp_orders_by_product_args', array('author' => $vendor->id, 'post_status' => array('wc-processing', 'wc-completed')));
         $orders = wcmp_get_orders($args);
         if(!empty($orders)) {
             foreach($orders as $order_id) {

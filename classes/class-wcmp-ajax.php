@@ -774,12 +774,12 @@ class WCMp_Ajax {
                 $get_children = $_product->get_children();
                 if (!empty($get_children)) {
                     foreach ($get_children as $child) {
-                        $orders = array_merge($orders, $vendor->get_vendor_orders_by_product($vendor->id, $child));
+                        $orders = array_merge($orders, $vendor->get_vendor_orders_by_product($vendor->term_id, $child));
                     }
                     $orders = array_unique($orders);
                 }
             } else {
-                $orders = array_unique($vendor->get_vendor_orders_by_product($vendor->id, $product_id));
+                $orders = array_unique($vendor->get_vendor_orders_by_product($vendor->term_id, $product_id));
             }
 
             foreach ($orders as $order_id) {
