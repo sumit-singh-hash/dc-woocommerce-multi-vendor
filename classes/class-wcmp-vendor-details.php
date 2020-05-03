@@ -523,35 +523,22 @@ class WCMp_Vendor {
     /**
      * get_vendor_orders_by_product function to get orders belongs to a vendor and a product
      * @access public
-     * @param product id , vendor term id 
+     * @param product id , vendor id 
      * @return array with order id
      */
-    public function get_vendor_orders_by_product($vendor_term_id, $product_id) {
+    public function get_vendor_orders_by_product($vendor_id, $product_id) {
         $order_dtl = array();
-        if ($product_id && $vendor_term_id) {
-            $commissions = false;
-            $args = array(
-                'post_type' => 'dc_commission',
-                'post_status' => array('publish', 'private'),
-                'posts_per_page' => -1,
-                'order' => 'asc',
-                'meta_query' => array(
-                    array(
-                        'key' => '_commission_vendor',
-                        'value' => absint($vendor_term_id),
-                        'compare' => '='
-                    ),
-                    array(
-                        'key' => '_commission_product',
-                        'value' => absint($product_id),
-                        'compare' => 'LIKE'
-                    ),
-                ),
-            );
-            $commissions = get_posts($args);
-            if (!empty($commissions)) {
-                foreach ($commissions as $commission) {
-                    $order_dtl[] = get_post_meta($commission->ID, '_commission_order_id', true);
+        $args = apply_filters('wcmp_orders_by_product_args', array('author' => $vendor_id, 'post_status' => array('wc-processing', 'wc-completed')));
+        $orders = wcmp_get_orders($args);
+        if(!empty($orders)) {
+            foreach($orders as $order_id) {
+                $order = wc_get_order( $order_id );
+                $items = $order->get_items();
+                foreach( $items as $item ) {
+                    $item_id = $item->get_variation_id() ? $item->get_variation_id() : $item->get_product_id();
+                    if( $product_id == $item_id ) {
+                        array_push($order_dtl,$order_id);
+                    }
                 }
             }
         }
