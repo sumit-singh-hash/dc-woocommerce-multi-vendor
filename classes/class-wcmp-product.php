@@ -21,6 +21,7 @@ class WCMp_Product {
         if (!is_user_wcmp_vendor(get_current_user_id())) {
             add_action('woocommerce_product_write_panel_tabs', array(&$this, 'add_vendor_tab'), 30);
             add_action('woocommerce_product_data_panels', array(&$this, 'output_vendor_tab'), 30);
+            add_action( 'add_meta_boxes', array( $this, 'product_comment_note_metabox' ) );
         }
         add_action('save_post', array(&$this, 'process_vendor_data'));
         if (get_wcmp_vendor_settings('is_policy_on', 'general') == 'Enable') {
@@ -778,6 +779,66 @@ class WCMp_Product {
             <?php echo $html; ?>
         </div>
         <?php
+    }
+
+    function product_comment_note_metabox( $post_type ) {
+        global $post;
+        $post_types = array('product');   
+        if ( in_array( $post_type, $post_types ) ) {
+            add_meta_box(
+                'wf_child_letters'
+                ,__( 'Rejection History', 'woocommerce' )
+                ,array( $this, 'render_meta_box_content' )
+                ,$post_type
+                ,'side'
+                ,'low'
+            );
+        }
+    }
+
+    function render_meta_box_content() {
+       global $post;
+        $notes = $this->get_product_note($post->ID);
+        $user_id = get_current_user_id();
+       if ( apply_filters('is_admin_can_add_product_notes', true, $user_id) && $post->post_status == 'pending' ) : ?>
+            <?php wp_nonce_field('dc-vendor-add-product-comment', 'vendor_add_product_nonce'); ?> 
+            <div class="add_note">
+                <p>
+                    <label for="add_order_note"><?php esc_html_e( 'Add note', 'woocommerce' ); ?> <?php echo wc_help_tip( __( 'Add a note for your reference, or add a customer note (the user will be notified).', 'woocommerce' ) ); ?></label>
+                    <textarea placeholder="<?php _e('Enter text ...', 'dc-woocommerce-multi-vendor'); ?>" class="form-control" name="product_comment_text"></textarea>
+                </p>
+                <p>
+                    <input class="add_note button wcmp-add-order-note" type="submit" name="wcmp_submit_product_comment" value="<?php _e('Submit', 'dc-woocommerce-multi-vendor'); ?>">
+                </p>
+            </div>
+            <input type="hidden" name="product_id" value="<?php echo $post->ID; ?>">
+            <input type="hidden" name="current_user_id" value="<?php echo $user_id; ?>">
+        <?php endif; 
+        $log_statuses = apply_filters('admin_product_logs_status', array('pending', 'publish'));
+        if( in_array($post->post_status, $log_statuses) ) { ?>
+            <div><b><?php echo esc_html_e( 'Communication Log', 'woocommerce' ); ?></b></div>
+            <ul class="order_notes">
+                <?php
+                if ($notes) {
+                    foreach ($notes as $note) {
+                        $author = get_comment_meta( $note->comment_ID, '_author_id', true );
+                        $Seller = is_user_wcmp_vendor($author) ? "(Seller)" : '';
+                        ?>
+                        <li class="note">
+                            <div class="note_content <?php echo $style; ?>">
+                                <?php echo wpautop( wptexturize( wp_kses_post( $note->comment_content ) ) ); ?>
+                            </div>
+                            <p ><?php echo esc_html_e($note->comment_author); ?><?php echo $Seller; ?> - <?php echo esc_html_e( date_i18n(wc_date_format() . ' ' . wc_time_format(), strtotime($note->comment_date) ) ); ?></p>
+                        </li>
+                        <?php
+                    }
+                }else{
+                    echo '<li class="list-group-item list-group-item-action flex-column align-items-start order-notes">' . __( 'There are no notes yet.', 'woocommerce' ) . '</li>';
+                }
+                ?>
+            </ul>
+            <?php
+        }
     }
 
     function add_policies_tab() {
@@ -1804,6 +1865,53 @@ class WCMp_Product {
             </li>";
         }
         return $html;
+    }
+
+    public static function add_product_note($product_id, $note, $user_id = 0) {
+        if (!$product_id) {
+            return 0;
+        }
+
+        if(is_user_wcmp_vendor($user_id)){
+            $vendor = get_wcmp_vendor($user_id);
+            $comment_author = $vendor->page_title;
+            $comment_author_email = $vendor->user_data->user_email;
+        } else {
+            $user                 = get_user_by( 'id', $user_id );
+            $comment_author       = $user->display_name;
+            $comment_author_email = $user->user_email;
+        }
+
+        $commentdata = apply_filters('wcmp_new_product_note_data', array(
+            'comment_post_ID' => $product_id,
+            'comment_author' => $comment_author,
+            'comment_author_email' => $comment_author_email,
+            'comment_author_url' => '',
+            'comment_content' => $note,
+            'comment_agent' => 'WCMp',
+            'comment_type' => 'product_note',
+            'comment_parent' => 0,
+            'comment_approved' => 1,
+                ), $product_id, $user_id);
+
+        $comment_id = wp_insert_comment($commentdata);
+
+        do_action('wcmp_new_product_note', $comment_id, $product_id, $user_id);
+
+        return $comment_id;
+    }
+
+    public static function get_product_note($product_id) {
+        global $WCMp;
+        $args = apply_filters('wcmp_new_product_get_note_data', array(
+            'post_id' => $product_id,
+            'type' => 'product_note',
+            'status' => 'approve',
+            'orderby' => 'comment_ID'
+        ));
+
+        $notes = get_comments($args);
+        return $notes;
     }
     
 }

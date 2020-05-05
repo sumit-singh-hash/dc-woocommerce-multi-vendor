@@ -140,7 +140,7 @@ class WCMp_Settings_To_Do_List {
         }
 
         //product
-        $args = array(
+         $args = array(
             'posts_per_page' => -1,
             'author__in' => $vendor_ids,
             'post_type' => 'product',
@@ -170,12 +170,12 @@ class WCMp_Settings_To_Do_List {
                     endif;
                     ?>
                     </tr>
-                        <?php
-                        foreach ($get_pending_products as $get_pending_product) {
-                            $dismiss = get_post_meta($get_pending_product->ID, '_dismiss_to_do_list', true);
-                            if ($dismiss)
-                                continue;
-                            ?>
+                    <?PHP
+                    foreach ($get_pending_products as $get_pending_product) {
+                        $dismiss = get_post_meta($get_pending_product->ID, '_dismiss_to_do_list', true);
+                        if ($dismiss)
+                            continue;
+                        ?>
                         <tr>
                             <?php
                             $currentvendor = get_wcmp_vendor($get_pending_product->post_author);
@@ -194,24 +194,45 @@ class WCMp_Settings_To_Do_List {
                                         case 'edit':
                                             ?>
                                             <td class="edit"><a target="_blank" href="post.php?post=<?php echo $get_pending_product->ID; ?>&action=edit"><input type="button" class="vendor_edit_button" value="Edit" /> </a> </td>
-                                <?php break;
-                            case 'dismiss':
-                                ?>
-                                            <td class="dismiss"><input class="vendor_dismiss_button" data-type="product" data-id="<?php echo $get_pending_product->ID; ?>"  type="button" id="dismiss_request" name="dismiss_request" value="Dismiss"></td>
-                                <?php
-                                break;
-                            default:
-                                do_action('wcmp_todo_pending_product_approval_table_row_data', $key, $get_pending_product);
-                                break;
-                        }
-                    }
-                endif;
-                ?>
+                                            <?php break;
+                                        case 'dismiss':
+                                            ?>
+                
+                                            <td>
+                                                <a data-toggle="modal" data-target="#wcmp-product-dismiss-modal-<?php echo $get_pending_product->ID; ?>" data-ques="<?php echo $get_pending_product->ID; ?>" class="question-details"><input class="vendor_dismiss_button" type="button" value="Dismiss"></a>
+                                                <div class="modal fade" id="wcmp-product-dismiss-modal-<?php echo $get_pending_product->ID; ?>" role="dialog">
+                                                    <div class="modal-dialog">
+                                                        <!-- Modal content-->
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                                <h4 class="modal-title"><?php echo __('Reason for dismissal', 'dc-woocommerce-multi-vendor'); ?></h4>
+                                                               
+                                                            </div>
+                                                            <div class="wcmp-product-dismiss-modal modal-body">
+                                                                <textarea class="form-control" rows="5" id="dismiss-reason-<?php echo $get_pending_product->ID; ?>" placeholder="<?php echo __('Add your note for seller', 'dc-woocommerce-multi-vendor'); ?>"></textarea>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" data-type="product" data-id="<?php echo $get_pending_product->ID; ?>" id="dismiss_request" name="dismiss_request" class="button action vendor_dismiss_submit"><?php echo __('Add', 'dc-woocommerce-multi-vendor'); ?></button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                 </div>
+                                            </td>
+                                    <?php
+                                    break;
+                                default:
+                                    do_action('wcmp_todo_pending_product_approval_table_row_data', $key, $get_pending_product);
+                                    break;
+                                    }
+                                }
+                            endif;
+                             ?>
                         </tr>
-            <?php } ?>
+                        <?php } ?>
                 </tbody>
             </table>
-            <?php
+        <?php
         }
 
 
