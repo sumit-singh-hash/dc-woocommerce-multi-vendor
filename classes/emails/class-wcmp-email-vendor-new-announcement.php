@@ -6,15 +6,15 @@ if (!defined('ABSPATH'))
 if (!class_exists('WC_Email_Vendor_New_Announcement')) :
 
     /**
-     * New Order Email
+     * New Announcement Email
      *
      * An email sent to the vendors when a new announcement is published.
      *
-     * @class 		WC_Email_Vendor_New_Announcement
-     * @version		2.0.0
-     * @package		WooCommerce/Classes/Emails
-     * @author 		WooThemes
-     * @extends 	WC_Email
+     * @class       WC_Email_Vendor_New_Announcement
+     * @version     2.0.0
+     * @package     WooCommerce/Classes/Emails
+     * @author      WooThemes
+     * @extends     WC_Email
      */
     class WC_Email_Vendor_New_Announcement extends WC_Email {
         public $order;
@@ -24,7 +24,7 @@ if (!class_exists('WC_Email_Vendor_New_Announcement')) :
         function __construct() {
             global $WCMp;
             $this->id = 'vendor_new_announcement';
-            $this->title = __('Vendor New announcement', 'dc-woocommerce-multi-vendor');
+            $this->title = __('Vendor New Announcement', 'dc-woocommerce-multi-vendor');
             $this->description = __('New announcement notification emails are sent when new announcement published.', 'dc-woocommerce-multi-vendor');
 
             $this->template_html = 'emails/vendor-new-announcement.php';
@@ -35,6 +35,38 @@ if (!class_exists('WC_Email_Vendor_New_Announcement')) :
             parent::__construct();
         }
 
+
+        /**
+         * trigger function.
+         *
+         * @access public
+         * @return void
+         */
+        function trigger( $post, $vendor, $single ) {
+            global $WCMp;
+
+            if ($vendor) {
+                $this->object = $post;
+                $this->find[] = '{title}';
+                $this->post_title = $post->post_title;
+                $this->replace[] = $this->post_title;
+
+                $vendor_email = $vendor->user_data->user_email;
+                $this->vendor_id = $vendor->id;
+                $this->recipient = $vendor_email;
+
+                $this->single = $single;
+
+
+                if (!$this->is_enabled() || !$this->get_recipient()) {
+                    return;
+                }
+
+                $result = $this->send($this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments());
+                    return $result;
+                }
+        }
+
         /**
          * Get email subject.
          *
@@ -42,7 +74,7 @@ if (!class_exists('WC_Email_Vendor_New_Announcement')) :
          * @return string
          */
         public function get_default_subject() {
-            return apply_filters('wcmp_vendor_new_announcement_email_subject', __('[{site_title}] New vendor announcement', 'dc-woocommerce-multi-vendor'), $this->object);
+            return apply_filters('wcmp_vendor_new_announcement_email_subject', __('Announcement - {title}', 'dc-woocommerce-multi-vendor'), $this->object);
         }
 
         /**
@@ -52,34 +84,7 @@ if (!class_exists('WC_Email_Vendor_New_Announcement')) :
          * @return string
          */
         public function get_default_heading() {
-            return apply_filters('wcmp_vendor_new_announcement_email_heading', __('New vendor announcement', 'dc-woocommerce-multi-vendor'), $this->object);
-        }
-
-        /**
-         * trigger function.
-         *
-         * @access public
-         * @return void
-         */
-        function trigger( $post, $vendor ) {
-                if ($vendor) {
-                    $title = $post->post_title;
-                    $content = $post->post_content;
-                    $this->object = $post->ID;
-                    $vendor_email = $vendor->user_data->user_email;
-                    $this->vendor_id = $vendor->id;
-                    $this->recipient = $vendor_email;
-                    $this->post_title = $title;
-                    $this->post_content = $content;
-
-
-                    if (!$this->is_enabled() || !$this->get_recipient()) {
-                        return;
-                    }
-
-                    $result = $this->send($this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments());
-                        return $result;
-                    }
+            return apply_filters('wcmp_vendor_new_announcement_email_heading', __('Announcement ', 'dc-woocommerce-multi-vendor'), $this->object);
         }
 
         /**
@@ -93,7 +98,7 @@ if (!class_exists('WC_Email_Vendor_New_Announcement')) :
                 'email_heading' => $this->get_heading(),
                 'vendor_id' => $this->vendor_id,
                 'post_title' => $this->post_title,
-                'post_content' => $this->post_content,
+                'single' => $this->single,
                 'sent_to_admin' => false,
                 'plain_text' => false,
                 'email'         => $this,
@@ -111,7 +116,7 @@ if (!class_exists('WC_Email_Vendor_New_Announcement')) :
                 'email_heading' => $this->get_heading(),
                 'vendor_id' => $this->vendor_id,
                 'post_title' => $this->post_title,
-                'post_content' => $this->post_content,
+                'single' => $this->single,
                 'sent_to_admin' => false,
                 'plain_text' => true,
                 'email'         => $this,
@@ -163,5 +168,5 @@ if (!class_exists('WC_Email_Vendor_New_Announcement')) :
         }
 
     }
-  
+
     endif;

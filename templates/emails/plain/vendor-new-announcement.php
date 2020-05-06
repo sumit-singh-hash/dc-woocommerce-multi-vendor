@@ -8,20 +8,22 @@
  * @package 	dc-product-vendor/Templates
  * @version   0.0.1
  */
- 
- 
+
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 global $WCMp;
 $vendor = get_wcmp_vendor( absint( $vendor_id ) );
 echo $email_heading . "\n\n";
 
-echo sprintf( __('A new announcement is added by admin. Their details is as follows:', 'dc-woocommerce-multi-vendor') ) . "\n\n";
+echo sprintf( __('%s', 'dc-woocommerce-multi-vendor'),  $post_title) . "\n\n";
 
-echo "****************************************************\n\n";
+$announcement_link = esc_url(wcmp_get_vendor_dashboard_endpoint_url(get_wcmp_vendor_settings('wcmp_vendor_announcements_endpoint', 'vendor', 'general', 'vendor-announcements')));
 
-echo sprintf( __( 'Announcement title : %s',  'dc-woocommerce-multi-vendor'), $post_title ) . "\n";
-printf( __( "View the announcement: %s",  'dc-woocommerce-multi-vendor' ), esc_url(wcmp_get_vendor_dashboard_endpoint_url(get_wcmp_vendor_settings('wcmp_vendor_announcements_endpoint', 'vendor', 'general', 'vendor-announcements'))));
+echo sprintf( __('This is to inform you that we recently updated the article %s. You can always check the changes from here  %s. We would request you to check the same and take the necessary action if required.'), $post_title, $announcement_link ) . "\n";
 
-echo "\n****************************************************\n\n";
+printf( __( "View the announcement: %s",  'dc-woocommerce-multi-vendor' ), esc_url(wcmp_get_vendor_dashboard_endpoint_url(get_wcmp_vendor_settings('wcmp_vendor_announcements_endpoint', 'vendor', 'general', 'vendor-announcements')))) . "\n";
 
-echo apply_filters( 'wcmp_email_footer_text', get_option( 'wcmp_email_footer_text' ) );
+printf( __('%s continued use of the Store, will be subject to the updated terms.', 'dc-woocommerce-multi-vendor'), $single );
+
+
+echo apply_filters( 'wcmp_email_footer_text', get_option( 'wcmp_email_footer_text' ) ); 

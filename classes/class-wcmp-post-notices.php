@@ -15,9 +15,10 @@ class WCMp_Notices {
   public function __construct() {
     $this->post_type = 'wcmp_vendor_notice';
     $this->register_post_type();
-    	add_action('transition_post_status', array( $this, 'vendor_notices_send_email' ), 10, 3 );
 		add_action( 'add_meta_boxes', array($this,'vendor_notices_add_meta_box_addtional_field') );
-		add_action( 'save_post', array( $this, 'vendor_notices_save_addtional_field' ), 10, 3 );		
+		add_action( 'add_meta_boxes', array($this,'vendor_notices_add_meta_box_select_vendor') );
+		add_action( 'save_post', array( $this, 'vendor_notices_save_addtional_field' ), 10, 3 );
+		add_action('transition_post_status', array( $this, 'vendor_notices_send_email' ), 10, 3 );		
   }
   
   
@@ -47,12 +48,55 @@ class WCMp_Notices {
 		<?php
   }
 
+  public function vendor_notices_add_meta_box_select_vendor() {
+  	global $WCMp;
+  		$WCMp->library->load_select2_lib();
+		$screens = array( 'wcmp_vendor_notice' );
+		foreach ( $screens as $screen ) {
+			add_meta_box(
+				'wcmp_vendor_notice_select_vendor',
+				__( 'Vendors', 'dc-woocommerce-multi-vendor' ),
+				array($this,'wcmp_vendor_notice_select_vendor_callback'),
+				$screen,
+				'side',
+				'low'
+			);
+		}  	
+  }
+
+  public function wcmp_vendor_notice_select_vendor_callback() {
+  	global $WCMp, $post;
+  	$selected_vendors = get_post_meta($post->ID, '_wcmp_vendor_notices_vendors', true);
+  	?>
+	<select id="show_announcement_vendors" name="show_announcement_vendors[]" class="" multiple="multiple" style="width:60%">
+        <?php
+        $vendors = get_wcmp_vendors();
+        if ($vendors){
+			foreach ($vendors as $vendor) {
+				$selected = in_array($vendor->id, $selected_vendors) ? 'selected' : '';
+                echo '<option value="' . esc_attr($vendor->id) . '" '.$selected.'>' . esc_html($vendor->page_title) . '</option>';
+            }
+        } ?>
+    </select>			
+	<script>
+	    jQuery(document).ready(function ($) {
+	    		 $("#show_announcement_vendors").select2({
+	            placeholder: '<?php echo trim(__('Select vendor...', 'dc-woocommerce-multi-vendor'));?>'
+	        });
+	    });		
+	</script>
+	<?php
+  }
+
   public function vendor_notices_send_email( $new_status, $old_status, $post ) { 
   	if ( $new_status == 'publish' && $old_status != 'publish' ) {
 		$email_vendor = WC()->mailer()->emails['WC_Email_Vendor_New_Announcement'];
-		$vendors = get_wcmp_vendors();
+		$selected_vendors = isset($_POST['show_announcement_vendors']) ? $_POST['show_announcement_vendors'] : '';
+		$all_vendor_ids = wp_list_pluck( get_wcmp_vendors(), 'id' );
+		$vendors = ($selected_vendors && !empty($selected_vendors)) ? $selected_vendors : $all_vendor_ids;
+		$single = (count($vendors) == 1) ? 'Your' : 'All vendors and their';
 		foreach ($vendors as $vendor) {
-			$email_vendor->trigger( $post, $vendor );
+			$email_vendor->trigger( $post, $vendor, $single );
     	}
   	}
   }
@@ -65,6 +109,9 @@ class WCMp_Notices {
     if(isset($_POST['_wcmp_vendor_notices_url'])) {
     	update_post_meta($post_id, '_wcmp_vendor_notices_url', $_POST['_wcmp_vendor_notices_url']);    	
     } 	
+    if(isset($_POST['show_announcement_vendors'])) {
+    	update_post_meta($post_id, '_wcmp_vendor_notices_vendors', $_POST['show_announcement_vendors']);    	
+    } 
   }
   
   /**
