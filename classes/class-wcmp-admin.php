@@ -323,7 +323,7 @@ class WCMp_Admin {
             'wcmp_page_wcmp-to-do',
             'edit-wcmp_vendorrequest',
             'dc_commission',
-            'woocommerce_page_wc-reports',
+            'wcmp_page_reports',
             'toplevel_page_wc-reports',
             'product',
             'edit-product',
@@ -337,6 +337,8 @@ class WCMp_Admin {
 	));
         
         // Register scripts.
+        wp_register_style( 'woocommerce_admin_reports_styles', WC()->plugin_url() . '/assets/css/admin.css', array() );
+        wp_register_style('admin-dashboard-style', $WCMp->plugin_url . 'assets/frontend/css/vendor_dashboard' . $suffix . '.css', array(), $WCMp->version);
         wp_register_style('wcmp_admin_css', $WCMp->plugin_url . 'assets/admin/css/admin' . $suffix . '.css', array(), $WCMp->version);
         wp_register_script('wcmp_admin_js', $WCMp->plugin_url . 'assets/admin/js/admin' . $suffix . '.js', apply_filters('wcmp_admin_script_add_dependencies', array('jquery', 'jquery-ui-core', 'jquery-ui-tabs', 'wc-backbone-modal')), $WCMp->version, true);
         wp_register_script('dc_to_do_list_js', $WCMp->plugin_url . 'assets/admin/js/to_do_list' . $suffix . '.js', array('jquery'), $WCMp->version, true);
@@ -347,7 +349,7 @@ class WCMp_Admin {
         wp_register_script('edit_user_js', $WCMp->plugin_url . 'assets/admin/js/edit_user' . $suffix . '.js', array('jquery'), $WCMp->version, true);
         wp_register_script('dc_users_js', $WCMp->plugin_url . 'assets/admin/js/to_do_list' . $suffix . '.js', array('jquery'), $WCMp->version, true);
         wp_register_script('wcmp_admin_product_auto_search_js', $WCMp->plugin_url . 'assets/admin/js/admin-product-auto-search' . $suffix . '.js', array('jquery'), $WCMp->version, true);
-        wp_register_script('wcmp_report_js', $WCMp->plugin_url . 'assets/admin/js/report' . $suffix . '.js', array('jquery'), $WCMp->version, true);
+        wp_register_script('wcmp_report_js', $WCMp->plugin_url . 'assets/admin/js/report' . $suffix . '.js', array( 'jquery', 'jquery-ui-datepicker' ), $WCMp->version, true);
         wp_register_script('wcmp_vendor_js', $WCMp->plugin_url . 'assets/admin/js/vendor' . $suffix . '.js', array('jquery', 'woocommerce_admin'), $WCMp->version, true);
         wp_register_script('wcmp_vendor_shipping',$WCMp->plugin_url . 'assets/admin/js/vendor-shipping' . $suffix . '.js', array( 'jquery', 'wp-util', 'underscore', 'backbone', 'jquery-ui-sortable', 'wc-backbone-modal' ), $WCMp->version );
 
@@ -409,7 +411,7 @@ class WCMp_Admin {
             
         endif;
 
-        if (in_array($screen->id, array('dc_commission', 'woocommerce_page_wc-reports', 'toplevel_page_wc-reports', 'product', 'edit-product'))) :
+        if (in_array($screen->id, array('dc_commission', 'wcmp_page_reports', 'toplevel_page_wc-reports', 'product', 'edit-product'))) :
             $WCMp->library->load_qtip_lib();
             if (!wp_style_is('woocommerce_chosen_styles', 'queue')) {
                 wp_enqueue_style('woocommerce_chosen_styles', $WCMp->plugin_url . '/assets/admin/css/chosen' . $suffix . '.css');
@@ -440,14 +442,20 @@ class WCMp_Admin {
             wp_enqueue_script('dc_users_js');
         endif;
 
-        if (in_array($screen->id, array('woocommerce_page_wc-reports', 'toplevel_page_wc-reports'))) :
+        if (in_array($screen->id, array('wcmp_page_reports', 'toplevel_page_wc-reports'))) :
             wp_enqueue_script('WCMp_chosen');
             wp_enqueue_script('WCMp_ajax-chosen');
             wp_enqueue_script('wcmp-admin-product-js');
             wp_localize_script('wcmp-admin-product-js', 'dc_vendor_object', array('security' => wp_create_nonce("search-products")));
         endif;
 
-        if (in_array($screen->id, array('woocommerce_page_wc-reports', 'toplevel_page_wc-reports'))) :
+        if (in_array($screen->id, array('wcmp_page_reports'))) :
+                wp_enqueue_style('admin-dashboard-style');
+                 wp_enqueue_style( 'woocommerce_admin_reports_styles' );
+                $WCMp->library->load_bootstrap_style_lib();
+        endif;
+
+        if (in_array($screen->id, array('wcmp_page_reports', 'toplevel_page_wc-reports'))) :
             wp_enqueue_script('wcmp_report_js');
         endif;
 

@@ -9,6 +9,7 @@ class WCMp_Settings {
     private $tabsection_vendor = array();
     private $tabsection_capabilities = array();
     private $vendor_class_obj;
+    private $report_class_obj;
 
     /**
      * Start up
@@ -45,6 +46,7 @@ class WCMp_Settings {
         add_action( 'settings_page_to_do_list_tab_init', array( &$this, 'to_do_list_tab_init' ), 10, 1 );
         add_action( 'settings_page_notices_tab_init', array( &$this, 'notices_tab_init' ), 10, 1 );
         add_action( 'settings_page_vendors_tab_init', array( &$this, 'vendors_tab_init' ), 10, 1 );
+        add_action( 'settings_page_reports_tab_init', array( &$this, 'reports_tab_init' ), 10, 1 );
 
         add_action( 'update_option_wcmp_vendor_general_settings_name', array( &$this, 'wcmp_update_option_wcmp_vendor_general_settings_name' ) );
         
@@ -85,7 +87,7 @@ class WCMp_Settings {
             , $WCMp->plugin_url . 'assets/images/dualcube.png'
             , 45
         );
-        add_submenu_page( 'wcmp', __( 'Reports', 'dc-woocommerce-multi-vendor' ), __( 'Reports', 'dc-woocommerce-multi-vendor' ), 'manage_woocommerce', 'wc-reports&tab=wcmp_vendors', '__return_false' );
+        $wcmp_reports_page = add_submenu_page( 'wcmp', __( 'Reports', 'dc-woocommerce-multi-vendor' ), __( 'Reports', 'dc-woocommerce-multi-vendor' ), 'manage_woocommerce', 'reports', array( $this, 'wcmp_reports' ) );
         $wcmp_vendors_page = add_submenu_page( 'wcmp', __( 'Vendors', 'dc-woocommerce-multi-vendor' ), __( 'Vendors', 'dc-woocommerce-multi-vendor' ), 'manage_woocommerce', 'vendors', array( $this, 'wcmp_vendors' ) );
         $wcmp_settings_page = add_submenu_page( 'wcmp', __( 'Settings', 'dc-woocommerce-multi-vendor' ), __( 'Settings', 'dc-woocommerce-multi-vendor' ), 'manage_woocommerce', 'wcmp-setting-admin', array( $this, 'create_wcmp_settings' ) );
 
@@ -98,7 +100,7 @@ class WCMp_Settings {
 
         // Assign priority incrmented by 1
         $wcmp_submenu_priority = array(
-        	'wc-reports&tab=wcmp_vendors' => 5,
+        	'reports' => 5,
         	'edit.php?post_type=dc_commission' => 0,
         	'edit.php?post_type=wcmp_vendor_notice' => 2,
         	'edit.php?post_type=wcmp_university' => 3,
@@ -118,6 +120,7 @@ class WCMp_Settings {
         add_action( 'load-' . $wcmp_extension_page, array( &$this, 'wcmp_settings_add_help_tab' ) );
         add_action( 'load-' . $wcmp_todo_list, array( &$this, 'wcmp_settings_add_help_tab' ) );
         add_action( 'load-' . $wcmp_vendors_page, array( &$this, 'wcmp_vendors_add_help_tab' ) );
+        add_action( 'load-' . $wcmp_reports_page, array( &$this, 'wcmp_reports_add_help_tab' ) );
         
         /* sort wcmp submenu */
         if ( isset( $submenu['wcmp'] ) ) {
@@ -209,6 +212,13 @@ class WCMp_Settings {
 		
 		$WCMp->admin->load_class( "settings-{$tab}", $WCMp->plugin_path, $WCMp->token );
 		$this->vendor_class_obj = new WCMp_Settings_WCMp_Vendors( $tab );
+    }
+
+    public function wcmp_reports_add_help_tab() {
+        global $WCMp;
+        $tab = 'reports';    
+        $WCMp->admin->load_class( "settings-{$tab}", $WCMp->plugin_path, $WCMp->token );
+        $this->report_class_obj = new WCMp_Settings_WCMp_Reports( $tab );
     }
     
     function vendors_set_option($status, $option, $value) {
@@ -522,6 +532,15 @@ class WCMp_Settings {
         ?>  
         <div class="wrap">
         	<?php do_action( "settings_page_vendors_tab_init", 'vendors' ); ?>
+            <?php do_action( 'dualcube_admin_footer' ); ?>
+        </div>
+        <?php
+    }
+
+    public function wcmp_reports() {
+        ?>  
+        <div class="wrap">
+            <?php do_action( "settings_page_reports_tab_init", 'reports' ); ?>
             <?php do_action( 'dualcube_admin_footer' ); ?>
         </div>
         <?php
@@ -848,6 +867,10 @@ class WCMp_Settings {
         //$WCMp->admin->load_class( "settings-{$tab}", $WCMp->plugin_path, $WCMp->token );
         //new WCMp_Settings_WCMp_Vendors( $tab );
         $this->vendor_class_obj->settings_page_init();
+    }
+
+    public function reports_tab_init( $tab ) {
+        $this->report_class_obj->settings_page_init();
     }
 
 
