@@ -115,7 +115,7 @@ class WCMp_Settings_WCMp_Reports {
        
         if (!class_exists('WC_Admin_Report'))
         		include(WC_ABSPATH . 'includes/admin/reports/class-wc-admin-report.php');
-        include( apply_filters('wcmp_admin_reports_path', include __DIR__ .'/../classes/reports/class-wcmp-report-' . $name . '.php', $name, $class) );
+        require_once( apply_filters('wcmp_admin_reports_path', dirname(plugin_dir_path(__FILE__)) .'/classes/reports/class-wcmp-report-' . $name . '.php', $name, $class) );
 
         if (!class_exists($class))
             return;

@@ -75,7 +75,7 @@ global $WCMp;
                             </div>
                             <div class="col-md-6">
                                 <div class="wcmp_displaybox2 text-center">
-                                    <h4><a href ="<?php echo admin_url('admin.php?page=wcmp-to-do'); ?>"><?php _e('Pending Approval', 'dc-woocommerce-multi-vendor'); ?></a></h4>
+                                    <h4><a href ="<?php echo admin_url('admin.php?page=wcmp-to-do'); ?>"><?php _e('Pending Vendors', 'dc-woocommerce-multi-vendor'); ?></a></h4>
                                     <h3><?php echo $pending_vendors; ?></h3>
                                 </div>
                             </div>
