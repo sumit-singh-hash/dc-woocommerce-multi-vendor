@@ -95,8 +95,8 @@ class WCMp_Notices {
 		$all_vendor_ids = wp_list_pluck( get_wcmp_vendors(), 'id' );
 		$vendors = ($selected_vendors && !empty($selected_vendors)) ? $selected_vendors : $all_vendor_ids;
 		$single = (count($vendors) == 1) ? 'Your' : 'All vendors and their';
-		foreach ($vendors as $vendor) {
-			$email_vendor->trigger( $post, $vendor, $single );
+		foreach ($vendors as $vendor_id) {
+			$email_vendor->trigger( $post, $vendor_id, $single );
     	}
   	}
   }

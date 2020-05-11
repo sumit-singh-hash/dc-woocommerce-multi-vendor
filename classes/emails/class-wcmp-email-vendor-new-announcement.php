@@ -42,9 +42,10 @@ if (!class_exists('WC_Email_Vendor_New_Announcement')) :
          * @access public
          * @return void
          */
-        function trigger( $post, $vendor, $single ) {
+        function trigger( $post, $vendor_id, $single ) {
             global $WCMp;
 
+            $vendor = get_wcmp_vendor($vendor_id);
             if ($vendor) {
                 $this->object = $post;
                 $this->find[] = '{title}';
