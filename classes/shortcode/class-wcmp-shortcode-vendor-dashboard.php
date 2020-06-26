@@ -31,7 +31,7 @@ class WCMp_Vendor_Dashboard_Shortcode {
                 wp_enqueue_script('wc-password-strength-meter');
             }
             echo '<div class="wcmp-dashboard woocommerce">';
-            wc_get_template('myaccount/form-login.php');
+            $WCMp->template->get_template('shortcode/form_login.php');
             echo '</div>';
         } else if (!is_user_wcmp_vendor(get_current_vendor_id())) {
         	$user = wp_get_current_user();
