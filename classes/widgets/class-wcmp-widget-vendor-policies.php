@@ -56,7 +56,7 @@ class WCMp_Widget_Vendor_Policies extends WC_Widget {
         $refund = isset( $instance['refund'] ) ? $instance['refund'] : $this->settings['refund']['std'];
         $cancel = isset( $instance['cancel'] ) ? $instance['cancel'] : $this->settings['cancel']['std'];
 
-        $policies = $this->get_wcmp_vendor_policies($vendor);
+        $policies = get_wcmp_vendor_policies($vendor);
 
         if(!empty($policies)) {
 
@@ -86,28 +86,6 @@ class WCMp_Widget_Vendor_Policies extends WC_Widget {
         do_action($this->widget_cssclass . '_bottom', $vendor);
         
         $this->widget_end($args);
-    }
-
-    function get_wcmp_vendor_policies($vendor = 0) {
-        $policies = array();
-        $shipping_policy = get_wcmp_vendor_settings('shipping_policy');
-        $refund_policy = get_wcmp_vendor_settings('refund_policy');
-        $cancellation_policy = get_wcmp_vendor_settings('cancellation_policy');
-        if (apply_filters('wcmp_vendor_can_overwrite_policies', true) && $vendor) {
-            $shipping_policy = get_user_meta($vendor->id, '_vendor_shipping_policy', true) ? get_user_meta($vendor->id, '_vendor_shipping_policy', true) : $shipping_policy;
-            $refund_policy = get_user_meta($vendor->id, '_vendor_refund_policy', true) ? get_user_meta($vendor->id, '_vendor_refund_policy', true) : $refund_policy;
-            $cancellation_policy = get_user_meta($vendor->id, '_vendor_cancellation_policy', true) ? get_user_meta($vendor->id, '_vendor_cancellation_policy', true) : $cancellation_policy;
-        }
-        if (!empty($shipping_policy)) {
-            $policies['shipping_policy'] = $shipping_policy;
-        }
-        if (!empty($refund_policy)) {
-            $policies['refund_policy'] = $refund_policy;
-        }
-        if (!empty($cancellation_policy)) {
-            $policies['cancellation_policy'] = $cancellation_policy;
-        }
-        return $policies;
     }
     
 }

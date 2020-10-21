@@ -149,4 +149,17 @@ jQuery(document).ready(function ($) {
             }
         });
     }
+
+    $('#follow_vendor').on('click', function() {
+        if(!$(this).parent().hasClass('followed')) {
+            var vendor = $(this).attr('data-id');
+            var data = {
+                action: 'wcmp_folllow_vendors',
+                vendor_id: vendor
+            };
+            $.post(frontend_js_script_data.ajax_url, data, function (response) {
+                $('#follow_vendor').parent().addClass('followed');
+            });
+        }
+    });
 });

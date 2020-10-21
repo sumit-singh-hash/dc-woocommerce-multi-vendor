@@ -16,6 +16,7 @@ class WCMp_Frontend {
         add_action('wp_enqueue_scripts', array(&$this, 'frontend_styles'), 999);
 
         add_action('woocommerce_archive_description', array(&$this, 'product_archive_vendor_info'), 10);
+        add_action('woocommerce_after_main_content', array(&$this, 'archive_vendor_policies'), 10);
         add_filter('body_class', array(&$this, 'set_product_archive_class'));
         add_action('template_redirect', array(&$this, 'template_redirect'));
 
@@ -458,6 +459,20 @@ class WCMp_Frontend {
                 $address = $vendor->get_formatted_address();
 
                 $WCMp->template->get_template('archive_vendor_info.php', array('vendor_id' => $vendor->id, 'banner' => $vendor->get_image('banner'), 'profile' => $image, 'description' => apply_filters('the_content', $description), 'mobile' => $vendor->phone, 'location' => $address, 'email' => $vendor->user_data->user_email));
+            }
+        }
+    }
+
+    public function archive_vendor_policies() {
+        global $WCMp;
+        if (is_tax($WCMp->taxonomy->taxonomy_name)) {
+            // Get vendor ID
+            $vendor_id = get_queried_object()->term_id;
+            // Get vendor info
+            $vendor = get_wcmp_vendor_by_term($vendor_id);
+            if( $vendor ) {
+                $policies = get_wcmp_vendor_policies($vendor);
+                $WCMp->template->get_template('archive_vendor_policies.php', array('vendor_id' => $vendor->id, 'policies' => $policies));
             }
         }
     }

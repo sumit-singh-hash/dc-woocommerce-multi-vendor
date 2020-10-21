@@ -15,8 +15,13 @@ $vendor_hide_phone = apply_filters('wcmp_vendor_store_header_hide_store_phone', 
 $vendor_hide_email = apply_filters('wcmp_vendor_store_header_hide_store_email', get_user_meta($vendor_id, '_vendor_hide_email', true), $vendor->id);
 $template_class = get_wcmp_vendor_settings('wcmp_vendor_shop_template', 'vendor', 'dashboard', 'template1');
 $template_class = apply_filters('can_vendor_edit_shop_template', false) && get_user_meta($vendor_id, '_shop_template', true) ? get_user_meta($vendor_id, '_shop_template', true) : $template_class;
+$customers = get_user_meta($vendor_id, 'following_customers', true);
+$followed = ($customers && in_array(get_current_user_id(), $customers)) ? 'followed' : '';
 ?>
 <div class="vendor_description_background wcmp_vendor_banner_template <?php echo $template_class; ?>">
+    <div class="wcmp_follow_vendor <?php echo $followed; ?>">
+        <input type="button" name="follow_vendor" id="follow_vendor" value="Follow" data-id="<?php echo $vendor_id; ?>">
+    </div>
     <div class="wcmp_vendor_banner">
         <?php
             if($banner != ''){

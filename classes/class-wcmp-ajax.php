@@ -138,6 +138,9 @@ class WCMp_Ajax {
         
         // ledger book
         add_action('wp_ajax_wcmp_vendor_banking_ledger_list', array($this, 'wcmp_vendor_banking_ledger_list'));
+
+        //Follow vendor
+        add_action('wp_ajax_wcmp_folllow_vendors', array($this, 'wcmp_folllow_vendors'));
     }
 
     /**
@@ -4369,6 +4372,22 @@ class WCMp_Ajax {
             );
             wp_send_json($json_data);
             die;
+        }
+    }
+
+    public function wcmp_folllow_vendors() {
+        $vendor_id = isset($_POST['vendor_id']) ? $_POST['vendor_id'] : '';
+        if( $vendor_id ){
+            $customers = get_user_meta($vendor_id, 'following_customers', true);
+            if(!empty($customers)) {
+                if(!in_array(get_current_user_id(), $customers)) {
+                   $followed = update_user_meta($vendor_id, 'following_customers', array_push($customers, get_current_user_id()));
+                }
+            } else {
+               $followed = update_user_meta($vendor_id, 'following_customers', array(get_current_user_id()));
+            }
+            echo $followed;
+            die();  
         }
     }
 

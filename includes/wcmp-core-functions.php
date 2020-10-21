@@ -2366,6 +2366,39 @@ if (!function_exists('get_color_shade')) {
 
 }
 
+if (!function_exists('get_wcmp_vendor_policies')) {
+
+    /**
+     * Get vendor policies.
+     * 
+     * @since 3.0.0
+     * @param int $vendor
+     * @return array $policies
+     */
+        function get_wcmp_vendor_policies($vendor = 0) {
+        $policies = array();
+        $shipping_policy = get_wcmp_vendor_settings('shipping_policy');
+        $refund_policy = get_wcmp_vendor_settings('refund_policy');
+        $cancellation_policy = get_wcmp_vendor_settings('cancellation_policy');
+        if (apply_filters('wcmp_vendor_can_overwrite_policies', true) && $vendor) {
+            $shipping_policy = get_user_meta($vendor->id, '_vendor_shipping_policy', true) ? get_user_meta($vendor->id, '_vendor_shipping_policy', true) : $shipping_policy;
+            $refund_policy = get_user_meta($vendor->id, '_vendor_refund_policy', true) ? get_user_meta($vendor->id, '_vendor_refund_policy', true) : $refund_policy;
+            $cancellation_policy = get_user_meta($vendor->id, '_vendor_cancellation_policy', true) ? get_user_meta($vendor->id, '_vendor_cancellation_policy', true) : $cancellation_policy;
+        }
+        if (!empty($shipping_policy)) {
+            $policies['shipping_policy'] = $shipping_policy;
+        }
+        if (!empty($refund_policy)) {
+            $policies['refund_policy'] = $refund_policy;
+        }
+        if (!empty($cancellation_policy)) {
+            $policies['cancellation_policy'] = $cancellation_policy;
+        }
+        return $policies;
+    }
+}
+
+
 if (!function_exists('get_wcmp_product_policies')) {
 
     /**

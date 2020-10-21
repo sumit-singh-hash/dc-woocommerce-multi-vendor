@@ -37,6 +37,8 @@ Class WCMp_Admin_Dashboard {
         if ( current_vendor_can( 'edit_shop_coupon' ) ) {
             add_action( 'template_redirect', array( &$this, 'save_coupon' ), 90 );
         }
+
+        add_action( 'save_post', array( &$this, 'notify_subscribed_customers' ), 99, 2 );
         
         add_filter( 'wcmp_vendor_dashboard_add_product_url', array( &$this, 'wcmp_vendor_dashboard_add_product_url' ), 10 );
         add_filter( 'wcmp_vendor_submit_product', array( &$this, 'wcmp_vendor_dashboard_add_product_url' ), 10 );
@@ -2164,6 +2166,21 @@ Class WCMp_Admin_Dashboard {
         } else {
             wc_add_notice( $post_id->get_error_message(), 'error' );
         }
+    }
+
+    public function notify_subscribed_customers($post_id, $post) {
+        $followed = get_post_meta($post_id, 'vendor_followed_email', true);
+        if( ( $post->post_type == 'product' || $post->post_type == 'shop_coupon' ) && $post->post_status == 'publish' && !$followed ) {
+             $customers = get_user_meta($post->post_author, 'following_customers', true);
+             if($customers) {
+                foreach($customers as $cust_id) {
+                    $customer = get_userdata($cust_id);
+                    $email = WC()->mailer()->emails['WC_Email_Vendor_Followed'];
+                    $email->trigger($customer, $post);
+                }
+                update_post_meta($post_id, 'vendor_followed_email', true);
+             }
+         }
     }
     
     public function wcmp_vendor_dashboard_add_product_url( $url ) {
